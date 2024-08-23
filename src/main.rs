@@ -3,6 +3,26 @@ use std::io;
 
 use rand::Rng;
 
+#[derive(Debug)]
+struct Player {
+    name: String,
+    tries: i32,
+}
+
+impl Player {
+    fn create_new(name: String) -> Player {
+        Player {
+            name,
+            tries: 0,
+        }
+    }
+
+    fn new_try(&mut self) {
+        self.tries += 1;
+    }
+}
+
+
 fn main() {
     let program_names = ["Guessing Game", "Fibonacci sequence"];
     let program_functions = [guessing_game, fibonacci];
@@ -36,10 +56,21 @@ fn guessing_game() {
     println!("Guess the number");
     println!("----------------------------");
 
+    println!("Please enter your name : ");
+
+    let mut name = String::new();
+    io::stdin().read_line(&mut name).expect("An error occurred");
+
+    let mut player = Player::create_new(String::from(name.trim()));
+
+
     let secret_number = rand::thread_rng().gen_range(1..=50);
 
+    println!("WELCOME {}", player.name);
 
     loop {
+        player.new_try();
+
         let mut guess = String::new();
 
         println!("Please input your guess.");
@@ -63,11 +94,11 @@ fn guessing_game() {
         println!("You guessed: {}", guess);
 
         match guess.cmp(&secret_number) {
-            Ordering::Less => println!("Too low"),
-            Ordering::Greater => println!("Too high"),
+            Ordering::Less => println!("Too low (Try {})",player.tries),
+            Ordering::Greater => println!("Too high (Try {})",player.tries),
 
             Ordering::Equal => {
-                println!("Congratulations !!!");
+                println!("Congratulations !!! {:?}", player);
                 break;
             }
         }
